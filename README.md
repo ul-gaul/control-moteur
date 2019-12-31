@@ -2,11 +2,6 @@
 
 ## Operation flow
 
-### Test mode
-
-
-### Launch mode
-
 1. B off, A and C open
 2. if fuel tank is filled and pressure >= 750 psi, go to 3, else go to 1
 3. C and A are off
@@ -20,7 +15,28 @@
 ## Components
 
 ### Processing units
-(To be confirmed) dsPIC
+
+Two microcontrollers are needed: one for the control of the actuators and data acquisition, one to manage the RF communication.
+The requirements for the motor control MCU are as follows:
+- 1 SPI bus, for the SD card
+- At least 6 GPIOs, probably a couple more to be safe
+- 1 UART bus to send data to the launch pad
+- Interrupt support on the UART bus if commands are to be received from the control station
+- FATfs support
+- at least 4KB of RAM
+- 4 ADC
+- (bus for the load cell)
+- (GPIOs for the continuity test)
+
+Potential MCUs:
+- PIC24FJXXXGB4XX
+- PIC24FJXXXGA4XX
+
+
+
+The requirements for the RF communication management MCU are as follows:
+- 2 UART bus, 3 would be nice though
+- Interrupt support on two UART ports, maybe needed on the third one if commands are to be received from the control station.
 
 ### Sensors
 
@@ -39,7 +55,6 @@
 - D: Disconnect control of the fill line from the fuel tank
 - E: Purge valve for the fuel tank
 - F: Valve to control the fuel flow to the combustion chamber
-
 
 ## Misc notes
 
