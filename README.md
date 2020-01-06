@@ -37,6 +37,8 @@ Potential MCUs:
 The requirements for the RF communication management MCU are as follows:
 - 2 UART bus, 3 would be nice though
 - Interrupt support on two UART ports, maybe needed on the third one if commands are to be received from the control station.
+- Good error detection capabilities, CRC would be best
+
 
 ### Sensors
 
@@ -61,4 +63,8 @@ The requirements for the RF communication management MCU are as follows:
 - pistons that disconnect the fill line from the fuel tank must retain their state unless it is changed to avoid a change of state when the line is disconnected and signals don't pass anymore. However, that same piston should ideally not remain in the "disconnect" state too long
 - the control of the pistons must be in the tower (fill line) because they are outside the rocket
 - should have a second MCU to synthetize rocket packets from rocket data from avionics and motor control data from the motor control system
+- what even is a CRC: https://www.youtube.com/watch?v=izG7qT0EpBw
+- good CRC polynomials: http://users.ece.cmu.edu/~koopman/crc/
+- CRC calculator: https://crccalc.com/
+- the data transmitted will probably be a start byte (constant), followed by a command byte and ended with a CRC byte
 
