@@ -17,4 +17,5 @@
 
 /* lib includes */
 #include "rocket-packet/rocket_packet.h"
+#include "actuator.h"
 
