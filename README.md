@@ -42,6 +42,9 @@ The requirements for the RF communication management MCU are as follows:
 
 ### Sensors
 
+Note: pressure sensors output an analog signal that has a range of 0 - Vref V.
+	This means the maximum output value is equal to the Vdd of the sensor.
+
 - P1: Used to measure the flow rate of the fuel to the combustion chamber
 - P2: Used to measure the flow rate of the fuel to the combustion chamber
 - P3: Pressure inside the fuel tank

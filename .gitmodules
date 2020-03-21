@@ -1,0 +1,3 @@
+[submodule "motor_control.X/rocket-packet"]
+	path = motor_control.X/rocket-packet
+	url = git@github.com:ul-gaul/rocket-packet.git
