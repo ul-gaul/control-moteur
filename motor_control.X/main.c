@@ -33,9 +33,25 @@ int main(void) {
 			}
 		}
 		unpack_command_packet(&cmdpkt, buf);
-		/* TODO: flip gpios to light LEDs according to the received command */
-		actuator_set(i, (i % 2 == 0));
+		/* TODO: flip gpios to light LEDs according to the received command:
+         * function values are 1 or 2, 1 sets the actuator state to 1, 2 sets
+         *  the actuator state to 0, if a function value is other than 1 or 2,
+         *  it should be ignored
+         * arg values are the number of the actuator, from 0 to 5, other
+         *  values should be ignored
+         */
+		//actuator_set(i, (i % 2 == 0));
+        
+        if ((0 < cmdpkt.function)&&(cmdpkt.function < 3)){ 
+            continue ;
+        }
+    
+        if (cmdpkt.arg > 5){
+           continue ;
+        }
+           
+        actuator_set(cmdpkt.arg, cmdpkt.function % 2);
 	}
-
+    
 	return 0;
 }
