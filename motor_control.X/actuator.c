@@ -5,7 +5,7 @@
 static int timer;
 
 
-void actuator_init(void) {
+int actuator_init(void) {
 	/* set pins as outputs */
 	TRISJbits.TRISJ0 = 0;
 	TRISJbits.TRISJ1 = 0;
@@ -25,6 +25,8 @@ void actuator_init(void) {
 	LATJbits.LATJ6 = 0; // !CLR
 	for (timer = 0;  timer < 100; ++timer);
 	LATJbits.LATJ6 = 1; // !CLR
+
+	return 0;
 }
 
 
