@@ -6,8 +6,6 @@ int main(void) {
 	if (init_all()) {
 		while(1);
 	}
-	
-	actuator_set(3, 1);
 
 	for(;;) {
 		switch (motor_cmd_h.state) {
@@ -25,7 +23,7 @@ int main(void) {
 			/* send acknowledge back */
 			motor_cmd_h.ackpkt.start_short = motor_cmd_h.cmd.start_short;
 			motor_cmd_h.ackpkt.id = motor_cmd_h.cmd.id;
-			motor_cmd_h.ackpkt.ack = ACK;
+			motor_cmd_h.ackpkt.ack = motor_cmd_h.ack;
 			pack_ack_packet(&motor_cmd_h.ackpkt, (uint8_t *) ack_tx_buf);
 			send_ack(ack_tx_buf, ACK_TX_BUF_SIZE);
 			/* reset state */
@@ -117,8 +115,13 @@ int enable_dma(void) {
 
 
 int init_comm_module_dma(void) {
+	/* CRC enabled, 16-bit polynomial, background mode, CRC on channel 0 */
+	DCRCXOR = CRC_POLY;
+	DCRCDATA = CRC_SEED;
+	DCRCCONbits.PLEN = CRC_LEN - 1;
+	DCRCCONbits.CRCEN = 1;
+
 	/* start IRQ is UART1 RX (113), disable pattern matching */
-	// DCH0ECONbits.CHSIRQ = 113;
 	DCH0ECONbits.CHSIRQ = _UART1_RX_VECTOR;
 	DCH0ECONbits.SIRQEN = 1;
 
@@ -170,7 +173,17 @@ int send_ack(char* src, int size) {
 
 
 void __ISR_AT_VECTOR(_DMA0_VECTOR, IPL5SRS) _dma_comm_module_isr_h(void) {
-	motor_cmd_h.state = cmd_received;
+	/* check if CRC is valid */
+	if (DCRCDATA == 0) {
+		motor_cmd_h.ack = ack;
+		motor_cmd_h.state = cmd_received;
+	} else {
+		motor_cmd_h.ack = nack;
+		motor_cmd_h.state = done;
+	}
+
+	/* seed the CRC */
+	DCRCDATA = CRC_SEED;
 
 	/* clear DMA0 interrupt bits */
 	DCH0INT &= ~0x000000ff;

@@ -45,10 +45,10 @@
 #define CRC_SEED 0x84cf
 
 /* buffer for commands from the communications module */
-#define CMD_RX_BUF_SIZE sizeof(CommandPacket)
+#define CMD_RX_BUF_SIZE CMD_PACKET_SIZE
 char __attribute__((coherent)) cmd_rx_buf[CMD_RX_BUF_SIZE];
 
-#define ACK_TX_BUF_SIZE sizeof(AckPacket)
+#define ACK_TX_BUF_SIZE ACK_PACKET_SIZE
 char __attribute__((coherent)) ack_tx_buf[ACK_TX_BUF_SIZE];
 
 
