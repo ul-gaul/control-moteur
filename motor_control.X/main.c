@@ -6,6 +6,17 @@ int main(void) {
 	if (init_all()) {
 		while(1);
 	}
+	
+	/* testing */
+	int i;
+	unsigned int j;
+	for (i = 0; i < 10; ++i) {
+		j = 0xffffff;
+		actuator_set(0, !!(i % 2));
+		actuator_set(2, !!(i % 2));
+		actuator_set(4, !!(i % 2));
+		while (j-- > 0);
+	}
 
 	for(;;) {
 		switch (motor_cmd_h.state) {
