@@ -37,6 +37,8 @@ int main(void) {
 			motor_cmd_h.ackpkt.ack = motor_cmd_h.ack;
 			pack_ack_packet(&motor_cmd_h.ackpkt, (uint8_t *) ack_tx_buf);
 			send_ack(ack_tx_buf, ACK_TX_BUF_SIZE);
+			/* TODO: resume sending motor data */
+
 			/* reset state */
 			motor_cmd_h.state = idle;
 			break;
@@ -184,6 +186,8 @@ int send_ack(char* src, int size) {
 
 
 void __ISR_AT_VECTOR(_DMA0_VECTOR, IPL5SRS) _dma_comm_module_isr_h(void) {
+	/* TODO: stop sending motor data */
+
 	/* check if CRC is valid */
 	if (DCRCDATA == 0) {
 		motor_cmd_h.ack = ack;
