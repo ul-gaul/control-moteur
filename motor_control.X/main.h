@@ -24,6 +24,7 @@
 /* lib includes */
 #include "rocket-packet/rocket_packet.h"
 #include "actuator.h"
+#include "manometer.h"
 
 
 /*
@@ -59,6 +60,10 @@ struct {
 	CommandPacket cmd;
 	AckPacket ackpkt;
 } motor_cmd_h;
+
+
+/* global buffer to hold pressure readings */
+int raw_pressures[4];
 
 
 /* public functions */

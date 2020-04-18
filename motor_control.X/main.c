@@ -19,6 +19,7 @@ int main(void) {
 	}
 
 	for(;;) {
+		manometer_read(raw_);
 		switch (motor_cmd_h.state) {
 		case idle:
 			break;
@@ -55,6 +56,9 @@ int init_all(void) {
 	int err = 0;
 
 	err = actuator_init();
+	if (err) goto exit;
+
+	err = manometer_init();
 	if (err) goto exit;
 
 	err = init_sdcard();

@@ -11,6 +11,17 @@
 #define _SENSOR_H_
 
 
+/*
+ * Initialize the 4 manometers' ADC channels
+ */
+int manometer_init(void);
+
+
+/*
+ * Read from all manometers and write to buffer
+ */
+int manometer_read(int res[4]);
+
 
 #endif /* _SENSOR_H_ */
 
