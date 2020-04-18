@@ -1,0 +1,9 @@
+# select device
+device PIC32MZ2048EFM144
+
+# select debug tool
+hwtool pickit4
+
+# program the debug image
+program ./dist/default/debug/motor_control.X.debug.elf
+

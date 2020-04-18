@@ -1,0 +1,1 @@
+make TYPE_IMAGE=DEBUG_RUN
