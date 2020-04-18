@@ -10,6 +10,8 @@
 #ifndef _SENSOR_H_
 #define _SENSOR_H_
 
+#include "xc.h"
+
 
 /*
  * Initialize the 4 manometers' ADC channels

@@ -1,15 +1,23 @@
-#include "sensor.h"
+#include "manometer.h"
 
 
 int manometer_init(void) {
+	/* init pins as analog inputs */
+	ANSELBbits.ANSB0 = 1;
+	ANSELBbits.ANSB1 = 1;
+	ANSELBbits.ANSB3 = 1;
+	ANSELBbits.ANSB4 = 1;
+	TRISBbits.TRISB0 = 1;
+	TRISBbits.TRISB1 = 1;
+	TRISBbits.TRISB3 = 1;
+	TRISBbits.TRISB4 = 1;
+
 	/* init ADC calibration settings */
 	ADC0CFG = DEVADC0;
 	ADC1CFG = DEVADC1;
 	ADC2CFG = DEVADC2;
 	ADC3CFG = DEVADC3;
 	ADC4CFG = DEVADC4;
-	ADC5CFG = DEVADC5;
-	ADC6CFG = DEVADC6;
 	ADC7CFG = DEVADC7;
 
 	/* configure ADCCON1, will turn on later, no features enabled */
@@ -98,7 +106,7 @@ int manometer_init(void) {
 	ADCTRG1bits.TRGSRC0 = 1;
 	ADCTRG1bits.TRGSRC1 = 1;
 	ADCTRG1bits.TRGSRC3 = 1;
-	ADCTRG1bits.TRGSRC4 = 1;
+	ADCTRG2bits.TRGSRC4 = 1;
 
 	/* configure early interrupts (unused) */
 	ADCEIEN1 = 0;
@@ -143,11 +151,13 @@ int manometer_read(int res[4]) {
 	while (ADCDSTAT1bits.ARDY1 == 0);
 	res[1] = ADCDATA1;
 	while (ADCDSTAT1bits.ARDY3 == 0);
-	res[3] = ADCDATA3;
+	res[2] = ADCDATA3;
 	while (ADCDSTAT1bits.ARDY4 == 0);
-	res[4] = ADCDATA4;
+	res[3] = ADCDATA4;
 
 	/* TODO: process results before returning (?) */
+	/* TODO: maybe trigger a conversion at the end so the function is faster? */
+	/*		(if the exact microsecond the data was sampled is not important) */
 
 	return 0;
 }

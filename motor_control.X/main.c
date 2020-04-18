@@ -19,7 +19,7 @@ int main(void) {
 	}
 
 	for(;;) {
-		manometer_read(raw_);
+		manometer_read(raw_pressures);
 		switch (motor_cmd_h.state) {
 		case idle:
 			break;
