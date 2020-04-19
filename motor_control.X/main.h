@@ -74,6 +74,7 @@ int init_comm_module_uart(void);
 int enable_dma(void);
 int init_comm_module_dma(void);
 int send_ack(char* src, int size);
+int execute_motor_cmd(CommandPacket* cmd);
 
 
 #endif /* _MAIN_H_ */

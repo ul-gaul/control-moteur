@@ -26,8 +26,17 @@ int main(void) {
 		case cmd_received:
 			/* unpack the command */
 			unpack_command_packet(&motor_cmd_h.cmd, (uint8_t *) cmd_rx_buf);
+			/* validate motor command's function and arg */
+			if (mc_valid_function(motor_cmd_h.cmd.function)
+					&& mc_valid_arg(motor_cmd_h.cmd.function, motor_cmd_h.cmd.arg)) {
+				motor_cmd_h.ack = NACK;
+				motor_cmd_h.state = done;
+				break;
+			}
 			/* execute the command */
-			actuator_set(motor_cmd_h.cmd.arg, motor_cmd_h.cmd.function % 2);
+			if (execute_motor_cmd(&motor_cmd_h.cmd) != 0) {
+				motor_cmd_h.ack = NACK;
+			}
 			/* set the state to done */
 			motor_cmd_h.state = done;
 			break;
@@ -186,6 +195,41 @@ int send_ack(char* src, int size) {
 	}
 
 	return i;
+}
+
+
+int execute_motor_cmd(CommandPacket* cmd) {
+	int i;
+
+	switch (cmd->function) {
+	case MC_SET_ACTUATOR:
+		actuator_set(cmd->arg, 1);
+		break;
+	case MC_CLR_ACTUATOR:
+		actuator_set(cmd->arg, 0);
+		break;
+	case MC_SET_ACTUATOR_MASK:
+		for (i = 0; i < ACTUATORS_NUM; ++i) {
+			if (arg & (1 << i)) {
+				actuator_set(i, 1);
+			}
+		}
+		break;
+	case MC_CLR_ACTUATOR_MASK:
+		for (i = 0; i < ACTUATORS_NUM; ++i) {
+			if (arg & (1 << i)) {
+				actuator_set(i, 0);
+			}
+		}
+		break;
+	case MC_SET_STATES:
+		for (i = 0; i < ACTUATORS_NUM; ++i) {
+			actuator_set(i, !!(arg & (1 << i)));
+		}
+		break;
+	}
+
+	return 0;
 }
 
 
