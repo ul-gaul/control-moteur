@@ -12,9 +12,11 @@
 
 #include "xc.h"
 
+#include "rocket-packet/rocket_packet.h"
+
 
 /*
- * Initialize the 4 manometers' ADC channels
+ * Initialize all the manometers' ADC channels
  */
 int manometer_init(void);
 
@@ -22,7 +24,7 @@ int manometer_init(void);
 /*
  * Read from all manometers and write to buffer
  */
-int manometer_read(int res[4]);
+int manometer_read(int res[MANOMETERS_NUM]);
 
 
 #endif /* _SENSOR_H_ */

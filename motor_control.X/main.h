@@ -62,8 +62,8 @@ struct {
 } motor_cmd_h;
 
 
-/* global buffer to hold pressure readings */
-int raw_pressures[4];
+/* global motor data */
+MotorData motor_data;
 
 
 /* public functions */

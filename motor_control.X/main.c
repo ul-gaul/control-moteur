@@ -19,7 +19,7 @@ int main(void) {
 	}
 
 	for(;;) {
-		manometer_read(raw_pressures);
+		manometer_read(motor_data.manometers);
 		switch (motor_cmd_h.state) {
 		case idle:
 			break;
@@ -210,21 +210,21 @@ int execute_motor_cmd(CommandPacket* cmd) {
 		break;
 	case MC_SET_ACTUATOR_MASK:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
-			if (arg & (1 << i)) {
+			if (cmd->arg & (1 << i)) {
 				actuator_set(i, 1);
 			}
 		}
 		break;
 	case MC_CLR_ACTUATOR_MASK:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
-			if (arg & (1 << i)) {
+			if (cmd->arg & (1 << i)) {
 				actuator_set(i, 0);
 			}
 		}
 		break;
 	case MC_SET_STATES:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
-			actuator_set(i, !!(arg & (1 << i)));
+			actuator_set(i, !!(cmd->arg & (1 << i)));
 		}
 		break;
 	}
