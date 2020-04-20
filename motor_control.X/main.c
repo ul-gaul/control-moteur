@@ -11,7 +11,7 @@ int main(void) {
 	int i;
 	unsigned int j;
 	for (i = 0; i < 10; ++i) {
-		j = 0xffffff;
+		j = 0x7fffff;
 		actuator_set(0, !!(i % 2));
 		actuator_set(2, !!(i % 2));
 		actuator_set(4, !!(i % 2));
@@ -204,14 +204,17 @@ int execute_motor_cmd(CommandPacket* cmd) {
 	switch (cmd->function) {
 	case MC_SET_ACTUATOR:
 		actuator_set(cmd->arg, 1);
+		motor_data.actuators_states[cmd->arg] = 1;
 		break;
 	case MC_CLR_ACTUATOR:
 		actuator_set(cmd->arg, 0);
+		motor_data.actuators_states[cmd->arg] = 0;
 		break;
 	case MC_SET_ACTUATOR_MASK:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
 			if (cmd->arg & (1 << i)) {
 				actuator_set(i, 1);
+				motor_data.actuators_states[i] = 1;
 			}
 		}
 		break;
@@ -219,12 +222,14 @@ int execute_motor_cmd(CommandPacket* cmd) {
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
 			if (cmd->arg & (1 << i)) {
 				actuator_set(i, 0);
+				motor_data.actuators_states[i] = 0;
 			}
 		}
 		break;
 	case MC_SET_STATES:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
-			actuator_set(i, !!(cmd->arg & (1 << i)));
+			motor_data.actuators_states[i] = !!(cmd->arg & (1 << i));
+			actuator_set(i, motor_data.actuators_states[i]);
 		}
 		break;
 	}
