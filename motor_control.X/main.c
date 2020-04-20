@@ -3,6 +3,10 @@
 
 int main(void) {
 
+	/* TODO: RWD */
+	TRISKbits.TRISK0 = 0;
+	LATKbits.LATK0 = 0;
+
 	if (init_all()) {
 		while(1);
 	}
@@ -79,6 +83,9 @@ int init_all(void) {
 	err = init_comm_module_dma();
 	if (err) goto exit;
 
+	err = init_timer();
+	if (err) goto exit;
+
 	err = init_interrupts();
 	if (err) goto exit;
 
@@ -103,6 +110,35 @@ int init_interrupts(void) {
 	PRISS = 0x76543210;
 	/* enable interrupts */
 	__builtin_enable_interrupts();
+
+	return 0;
+}
+
+
+int init_timer(void) {
+	/*
+	 * use timer 2 to generate an interrupt every 10 ms,
+	 * 16-bit mode, clock source is internal peripheral clock,
+	 * prescaler is 4
+	 */
+	T2CONbits.SIDL = 0;
+	T2CONbits.TGATE = 0;
+	T2CONbits.TCKPS = 0b110;
+	T2CONbits.T32 = 0;
+	T2CONbits.TCS = 0;
+
+	TMR2 = 0;
+
+	PR2 = 0x5ae7;
+
+	/* enable interrupts for timer 2, priority = 2, sub-priority = 3 */
+	IFS0bits.T2IF = 0;
+	IPC2bits.T2IP = 2;
+	IPC2bits.T2IS = 3;
+	IEC0bits.T2IE = 1;
+
+	/* start the timer */
+	T2CONbits.ON = 1;
 
 	return 0;
 }
@@ -204,17 +240,17 @@ int execute_motor_cmd(CommandPacket* cmd) {
 	switch (cmd->function) {
 	case MC_SET_ACTUATOR:
 		actuator_set(cmd->arg, 1);
-		motor_data.actuators_states[cmd->arg] = 1;
+		motor_data.actuator_states[cmd->arg] = 1;
 		break;
 	case MC_CLR_ACTUATOR:
 		actuator_set(cmd->arg, 0);
-		motor_data.actuators_states[cmd->arg] = 0;
+		motor_data.actuator_states[cmd->arg] = 0;
 		break;
 	case MC_SET_ACTUATOR_MASK:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
 			if (cmd->arg & (1 << i)) {
 				actuator_set(i, 1);
-				motor_data.actuators_states[i] = 1;
+				motor_data.actuator_states[i] = 1;
 			}
 		}
 		break;
@@ -222,19 +258,27 @@ int execute_motor_cmd(CommandPacket* cmd) {
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
 			if (cmd->arg & (1 << i)) {
 				actuator_set(i, 0);
-				motor_data.actuators_states[i] = 0;
+				motor_data.actuator_states[i] = 0;
 			}
 		}
 		break;
 	case MC_SET_STATES:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
-			motor_data.actuators_states[i] = !!(cmd->arg & (1 << i));
-			actuator_set(i, motor_data.actuators_states[i]);
+			motor_data.actuator_states[i] = !!(cmd->arg & (1 << i));
+			actuator_set(i, motor_data.actuator_states[i]);
 		}
 		break;
 	}
 
 	return 0;
+}
+
+
+void __ISR_AT_VECTOR(_TIMER_2_VECTOR, IPL2SRS) _timer2_isr_h(void) {
+	LATKbits.LATK0 = !LATKbits.LATK0;
+
+	/* clear timer 2 interrupt flag */
+	IFS0bits.T2IF = 0;
 }
 
 

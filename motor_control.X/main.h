@@ -69,6 +69,7 @@ MotorData motor_data;
 /* public functions */
 int init_all(void);
 int init_sdcard(void);
+int init_timer();
 int init_interrupts(void);
 int init_comm_module_uart(void);
 int enable_dma(void);
