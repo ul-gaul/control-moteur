@@ -63,7 +63,12 @@ struct {
 
 
 /* global motor data */
-MotorData motor_data;
+struct {
+	union {
+		MotorData data;
+		char buf[MOTOR_DATA_SIZE];
+	};
+} motor_data;
 
 
 /* public functions */
@@ -71,10 +76,10 @@ int init_all(void);
 int init_sdcard(void);
 int init_timer();
 int init_interrupts(void);
-int init_comm_module_uart(void);
 int enable_dma(void);
+int init_comm_module_uart(void);
 int init_comm_module_dma(void);
-int send_ack(char* src, int size);
+int comm_module_write(char* src, int size);
 int execute_motor_cmd(CommandPacket* cmd);
 
 

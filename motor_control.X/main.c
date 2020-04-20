@@ -23,7 +23,7 @@ int main(void) {
 	}
 
 	for(;;) {
-		manometer_read(motor_data.manometers);
+		manometer_read(motor_data.data.manometers);
 		switch (motor_cmd_h.state) {
 		case idle:
 			break;
@@ -50,9 +50,7 @@ int main(void) {
 			motor_cmd_h.ackpkt.id = motor_cmd_h.cmd.id;
 			motor_cmd_h.ackpkt.ack = motor_cmd_h.ack;
 			pack_ack_packet(&motor_cmd_h.ackpkt, (uint8_t *) ack_tx_buf);
-			send_ack(ack_tx_buf, ACK_TX_BUF_SIZE);
-			/* TODO: resume sending motor data */
-
+			comm_module_write(ack_tx_buf, ACK_TX_BUF_SIZE);
 			/* reset state */
 			motor_cmd_h.state = idle;
 			break;
@@ -220,7 +218,7 @@ int init_comm_module_dma(void) {
 }
 
 
-int send_ack(char* src, int size) {
+int comm_module_write(char* src, int size) {
 	int i;
 
 	for (i = 0; i < size; ++i) {
@@ -240,17 +238,17 @@ int execute_motor_cmd(CommandPacket* cmd) {
 	switch (cmd->function) {
 	case MC_SET_ACTUATOR:
 		actuator_set(cmd->arg, 1);
-		motor_data.actuator_states[cmd->arg] = 1;
+		motor_data.data.actuator_states[cmd->arg] = 1;
 		break;
 	case MC_CLR_ACTUATOR:
 		actuator_set(cmd->arg, 0);
-		motor_data.actuator_states[cmd->arg] = 0;
+		motor_data.data.actuator_states[cmd->arg] = 0;
 		break;
 	case MC_SET_ACTUATOR_MASK:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
 			if (cmd->arg & (1 << i)) {
 				actuator_set(i, 1);
-				motor_data.actuator_states[i] = 1;
+				motor_data.data.actuator_states[i] = 1;
 			}
 		}
 		break;
@@ -258,14 +256,14 @@ int execute_motor_cmd(CommandPacket* cmd) {
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
 			if (cmd->arg & (1 << i)) {
 				actuator_set(i, 0);
-				motor_data.actuator_states[i] = 0;
+				motor_data.data.actuator_states[i] = 0;
 			}
 		}
 		break;
 	case MC_SET_STATES:
 		for (i = 0; i < ACTUATORS_NUM; ++i) {
-			motor_data.actuator_states[i] = !!(cmd->arg & (1 << i));
-			actuator_set(i, motor_data.actuator_states[i]);
+			motor_data.data.actuator_states[i] = !!(cmd->arg & (1 << i));
+			actuator_set(i, motor_data.data.actuator_states[i]);
 		}
 		break;
 	}
@@ -277,14 +275,16 @@ int execute_motor_cmd(CommandPacket* cmd) {
 void __ISR_AT_VECTOR(_TIMER_2_VECTOR, IPL2SRS) _timer2_isr_h(void) {
 	LATKbits.LATK0 = !LATKbits.LATK0;
 
+	if (motor_cmd_h.state == idle) {
+		comm_module_write(motor_data.buf, MOTOR_DATA_SIZE);
+	}
+
 	/* clear timer 2 interrupt flag */
 	IFS0bits.T2IF = 0;
 }
 
 
 void __ISR_AT_VECTOR(_DMA0_VECTOR, IPL5SRS) _dma_comm_module_isr_h(void) {
-	/* TODO: stop sending motor data */
-
 	/* check if CRC is valid */
 	if (DCRCDATA == 0) {
 		motor_cmd_h.ack = ack;
