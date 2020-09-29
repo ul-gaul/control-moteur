@@ -16,34 +16,33 @@
 
 ### Processing units
 
-Two microcontrollers are needed: one for the control of the actuators and data acquisition, one to manage the RF communication.
+The processing units chosen were the PIC32MZ2048.
+
 The requirements for the motor control MCU are as follows:
+
 - 1 SPI bus, for the SD card
 - At least 6 GPIOs, probably a couple more to be safe
 - 1 UART bus to send data to the launch pad
-- Interrupt support on the UART bus if commands are to be received from the control station
+- Interrupt support on the UART bus if commands are to be received
+	from the control station
 - FATfs support
 - at least 4KB of RAM
 - 4 ADC
 - (bus for the load cell)
 - (GPIOs for the continuity test)
 
-Potential MCUs:
-- PIC24FJXXXGB4XX
-- PIC24FJXXXGA4XX
-
-
 
 The requirements for the RF communication management MCU are as follows:
 - 2 UART bus, 3 would be nice though
-- Interrupt support on two UART ports, maybe needed on the third one if commands are to be received from the control station.
+- Interrupt support on two UART ports, maybe needed on the third one if
+	commands are to be received from the control station.
 - Good error detection capabilities, CRC would be best
 
 
 ### Sensors
 
 Note: pressure sensors output an analog signal that has a range of 0 - Vref V.
-	This means the maximum output value is equal to the Vdd of the sensor.
+This means the maximum output value is equal to the Vdd of the sensor.
 
 - P1: Used to measure the flow rate of the fuel to the combustion chamber
 - P2: Used to measure the flow rate of the fuel to the combustion chamber
@@ -54,6 +53,8 @@ Note: pressure sensors output an analog signal that has a range of 0 - Vref V.
 
 ### Actuators
 
+The motor control system control 6 actuators:
+
 - A: First valve to control the filling of the fuel tank
 - B: Purge valve for the fill line of the fuel tank
 - C: Second valve to control the filling of the fuel tank
@@ -63,11 +64,10 @@ Note: pressure sensors output an analog signal that has a range of 0 - Vref V.
 
 ## Misc notes
 
-- pistons that disconnect the fill line from the fuel tank must retain their state unless it is changed to avoid a change of state when the line is disconnected and signals don't pass anymore. However, that same piston should ideally not remain in the "disconnect" state too long
-- the control of the pistons must be in the tower (fill line) because they are outside the rocket
-- should have a second MCU to synthetize rocket packets from rocket data from avionics and motor control data from the motor control system
-- what even is a CRC: https://www.youtube.com/watch?v=izG7qT0EpBw
-- good CRC polynomials: http://users.ece.cmu.edu/~koopman/crc/
-- CRC calculator: https://crccalc.com/
-- the data transmitted will probably be a start byte (constant), followed by a command byte and ended with a CRC byte
+- pistons that disconnect the fill line from the fuel tank must retain their
+	state unless it is changed to avoid a change of state when the line is
+	disconnected and signals don't pass anymore. However, that same piston
+	should ideally not remain in the "disconnect" state too long
+- the control of the pistons must be in the tower (fill line) because they
+	are outside the rocket
 
